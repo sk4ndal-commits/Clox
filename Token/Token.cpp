@@ -4,7 +4,6 @@
 
 #include <string_view>
 #include <any>
-#include <variant>
 #include "../Enums/TokenType.cpp"
 
 typedef struct Token {

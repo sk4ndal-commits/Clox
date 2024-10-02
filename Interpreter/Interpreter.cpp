@@ -22,6 +22,6 @@ void Interpreter::run(const std::string_view &source) {
     std::vector<Token> tokens = Scanner::scantTokens(source);
 
     for (auto& token:tokens) {
-        std::cout << token.lexeme << std::endl;
+        std::cout << "Lexeme " << token.lexeme << " on line " << token.line << std::endl;
     }
 }

@@ -3,6 +3,7 @@
 //
 
 #include <string>
+#include "../Scanner/Scanner.h"
 
 class Interpreter {
 public:

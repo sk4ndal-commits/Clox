@@ -3,13 +3,10 @@
 //
 
 #include <string_view>
-
-#ifndef CLOX_SCANNER_H
-#define CLOX_SCANNER_H
-
-#endif //CLOX_SCANNER_H
+#include <vector>
+#include "../Token/Token.cpp"
 
 class Scanner {
 public:
-    static void scantTokens(const std::string_view& source );
+    static std::vector<Token> scantTokens(const std::string_view& source );
 };

@@ -9,16 +9,19 @@
 class Scanner {
 private:
     int current;
+    int start;
+    int line;
+    std::vector<Token> tokens;
+    std::string_view code;
 public:
-    static std::vector<Token> scantTokens(const std::string_view &source);
+    Scanner();
+    ~Scanner();
 
-    static char advance(int &current, const std::string_view &source);
+    std::vector<Token> scantTokens(const std::string_view &source);
 
-    static void addFullToken(
-            std::vector<Token> &tokens,
-            TokenType type,
-            const std::string_view &source,
-            int start,
-            int current,
-            int line);
+    char advance();
+
+    void addToken(TokenType type);
+
+    void scanToken();
 };

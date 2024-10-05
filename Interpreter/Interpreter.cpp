@@ -19,9 +19,10 @@ void Interpreter::runFile(const std::ifstream &file) {
 }
 
 void Interpreter::run(const std::string_view &source) {
-    std::vector<Token> tokens = Scanner::scantTokens(source);
+    Scanner scanner;
+    std::vector<Token> tokens = scanner.scantTokens(source);
 
-    for (auto& token:tokens) {
+    for (Token& token:tokens) {
         std::cout << "Lexeme " << token.lexeme << " on line " << token.line << std::endl;
     }
 }

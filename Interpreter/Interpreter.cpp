@@ -22,7 +22,9 @@ void Interpreter::run(const std::string_view &source) {
     Scanner scanner;
     std::vector<Token> tokens = scanner.scanTokens(source);
 
-    for (Token& token:tokens) if (!token.lexeme.empty()) {
-        std::cout << "Lexeme " << token.lexeme << " on line " << token.line << std::endl;
-    }
+    for (Token &token: tokens)
+        if (!token.lexeme.empty()) {
+            std::cout << "Lexeme " << token.lexeme << " on line " << token.line
+                      << std::endl;
+        }
 }

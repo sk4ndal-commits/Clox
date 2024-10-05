@@ -15,10 +15,20 @@ private:
     std::string_view code;
 public:
     Scanner();
+
     ~Scanner();
 
     std::vector<Token> scanTokens(const std::string_view &source);
+
     void scanToken();
+
     char advance();
+
+    char getCurrentChar();
+
     void addToken(TokenType type);
+
+    bool isAtEnd();
+
+    bool nextCharMatches(char  expected);
 };

@@ -17,11 +17,8 @@ public:
     Scanner();
     ~Scanner();
 
-    std::vector<Token> scantTokens(const std::string_view &source);
-
-    char advance();
-
-    void addToken(TokenType type);
-
+    std::vector<Token> scanTokens(const std::string_view &source);
     void scanToken();
+    char advance();
+    void addToken(TokenType type);
 };

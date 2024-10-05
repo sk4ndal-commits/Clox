@@ -14,7 +14,7 @@ Scanner::Scanner() {
 
 Scanner::~Scanner() = default;
 
-std::vector<Token> Scanner::scantTokens(const std::string_view &source) {
+std::vector<Token> Scanner::scanTokens(const std::string_view &source) {
     this->code = source;
 
     while (this->current < this->code.length()) {
@@ -93,6 +93,10 @@ void Scanner::scanToken() {
         }
         case '*': {
             addToken(TokenType::Star);
+            break;
+        }
+        case '\n': {
+            this->line++;
             break;
         }
         default: {

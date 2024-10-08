@@ -28,6 +28,10 @@ public:
 
     void addToken(TokenType type);
 
+    void addToken(TokenType type, std::any literal);
+
+    void readString();
+
     bool isAtEnd();
 
     bool nextCharMatches(char  expected);

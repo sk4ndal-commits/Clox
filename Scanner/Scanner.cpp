@@ -39,39 +39,58 @@ char Scanner::advance() {
 }
 
 void Scanner::addToken(TokenType type) {
-
-    int lexemeLength = this->current - this->start;
-
-    Token t;
-    t.type = type;
-    t.lexeme = this->code.substr(this->start, lexemeLength);
-    t.literal = nullptr;
-    t.line = this->line;
-
-    this->tokens.push_back(t);
+    this->addToken(type, nullptr);
 }
 
 void Scanner::scanToken() {
     char c = advance();
     switch (c) {
-        case '(': addToken(TokenType::LeftParen); break;
-        case ')': addToken(TokenType::RightParen); break;
-        case '{': addToken(TokenType::LeftBrace); break;
-        case '}': addToken(TokenType::RightBrace); break;
-        case ',': addToken(TokenType::Comma); break;
-        case '.': addToken(TokenType::Dot); break;
-        case '-': addToken(TokenType::Minus); break;
-        case '+': addToken(TokenType::Plus); break;
-        case ';': addToken(TokenType::Semicolon); break;
-        case '*': addToken(TokenType::Star); break;
-        case '!': addToken(nextCharMatches('=') ?
-                    TokenType::BangEqual : TokenType::Bang); break;
-        case '=': addToken(nextCharMatches('=') ?
-                    TokenType::EqualEqual : TokenType::Equal); break;
-        case '<': addToken(nextCharMatches('=') ?
-                    TokenType::LessEqual : TokenType::Less); break;
-        case '>': addToken(nextCharMatches('=') ?
-                    TokenType::GreaterEqual : TokenType::Greater); break;
+        case '(':
+            addToken(TokenType::LeftParen);
+            break;
+        case ')':
+            addToken(TokenType::RightParen);
+            break;
+        case '{':
+            addToken(TokenType::LeftBrace);
+            break;
+        case '}':
+            addToken(TokenType::RightBrace);
+            break;
+        case ',':
+            addToken(TokenType::Comma);
+            break;
+        case '.':
+            addToken(TokenType::Dot);
+            break;
+        case '-':
+            addToken(TokenType::Minus);
+            break;
+        case '+':
+            addToken(TokenType::Plus);
+            break;
+        case ';':
+            addToken(TokenType::Semicolon);
+            break;
+        case '*':
+            addToken(TokenType::Star);
+            break;
+        case '!':
+            addToken(nextCharMatches('=') ?
+                     TokenType::BangEqual : TokenType::Bang);
+            break;
+        case '=':
+            addToken(nextCharMatches('=') ?
+                     TokenType::EqualEqual : TokenType::Equal);
+            break;
+        case '<':
+            addToken(nextCharMatches('=') ?
+                     TokenType::LessEqual : TokenType::Less);
+            break;
+        case '>':
+            addToken(nextCharMatches('=') ?
+                     TokenType::GreaterEqual : TokenType::Greater);
+            break;
         case '/':
             if (nextCharMatches('/')) {
                 while (getCurrentChar() != '\n' && !isAtEnd())
@@ -86,6 +105,9 @@ void Scanner::scanToken() {
             break;
         case '\n':
             this->line++;
+            break;
+        case '"':
+            this->readString();
             break;
         default:
             std::cerr << "Unexpected token " << c << std::endl;
@@ -110,3 +132,33 @@ char Scanner::getCurrentChar() {
     return this->code[this->current];
 }
 
+void Scanner::readString() {
+    while (this->getCurrentChar() != '"' && !this->isAtEnd()) {
+        if (this->getCurrentChar() == '\n') this->line++;
+        advance();
+    }
+
+    if (this->isAtEnd()) {
+        std::cerr << "unterminated string" << std::endl;
+    }
+
+    advance();
+
+    int lexemeLength = (this->current - 1) - (this->start + 1);
+    std::string_view value =
+            this->code.substr(this->start + 1, lexemeLength);
+    addToken(TokenType::String, value);
+}
+
+void Scanner::addToken(TokenType type, std::any literal) {
+    int lexemeLength = this->current - this->start;
+    std::string_view text = this->code.substr(this->start, lexemeLength);
+
+    Token t;
+    t.type = type;
+    t.lexeme = text;
+    t.literal = literal;
+    t.line = this->line;
+
+    this->tokens.push_back(t);
+}

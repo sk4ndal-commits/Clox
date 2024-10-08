@@ -24,7 +24,7 @@ public:
 
     char advance();
 
-    char getCurrentChar();
+    char peek();
 
     void addToken(TokenType type);
 

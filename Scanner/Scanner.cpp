@@ -6,11 +6,7 @@
 #include <iostream>
 #include "Scanner.h"
 
-Scanner::Scanner() {
-    this->current = 0;
-    this->start = 0;
-    this->line = 1;
-}
+Scanner::Scanner() : current(0), start(0), line(0) {}
 
 Scanner::~Scanner() = default;
 
@@ -23,19 +19,12 @@ std::vector<Token> Scanner::scanTokens(const std::string_view &source) {
         this->scanToken();
     }
 
-    Token eofToken;
-    eofToken.type = TokenType::Eof;
-    eofToken.lexeme = "";
-    eofToken.literal = nullptr;
-    eofToken.line = line;
-
-    tokens.push_back(eofToken);
+    tokens.emplace_back(TokenType::Eof, "", nullptr, line);
     return tokens;
 }
 
 char Scanner::advance() {
-    this->current++;
-    return this->code[this->current - 1];
+    return this->code[this->current++];
 }
 
 void Scanner::addToken(TokenType type) {
@@ -93,7 +82,7 @@ void Scanner::scanToken() {
             break;
         case '/':
             if (nextCharMatches('/')) {
-                while (getCurrentChar() != '\n' && !isAtEnd())
+                while (peek() != '\n' && !isAtEnd())
                     advance();
             } else {
                 addToken(TokenType::Slash);
@@ -120,21 +109,18 @@ bool Scanner::isAtEnd() {
 }
 
 bool Scanner::nextCharMatches(char expected) {
-    if (this->isAtEnd()) return false;
-    if (this->code[this->current] != expected) return false;
-
+    if (this->isAtEnd() || this->code[this->current] != expected) return false;
     this->current++;
     return true;
 }
 
-char Scanner::getCurrentChar() {
-    if (this->isAtEnd()) return '\0';
-    return this->code[this->current];
+char Scanner::peek() {
+    return this->isAtEnd() ? '\0' : this->code[this->current];
 }
 
 void Scanner::readString() {
-    while (this->getCurrentChar() != '"' && !this->isAtEnd()) {
-        if (this->getCurrentChar() == '\n') this->line++;
+    while (this->peek() != '"' && !this->isAtEnd()) {
+        if (this->peek() == '\n') this->line++;
         advance();
     }
 
@@ -153,12 +139,5 @@ void Scanner::readString() {
 void Scanner::addToken(TokenType type, std::any literal) {
     int lexemeLength = this->current - this->start;
     std::string_view text = this->code.substr(this->start, lexemeLength);
-
-    Token t;
-    t.type = type;
-    t.lexeme = text;
-    t.literal = literal;
-    t.line = this->line;
-
-    this->tokens.push_back(t);
+    this->tokens.emplace_back(type, text, literal, line);
 }

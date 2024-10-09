@@ -99,7 +99,11 @@ void Scanner::scanToken() {
             this->readString();
             break;
         default:
-            std::cerr << "Unexpected token " << c << std::endl;
+            if (Scanner::isDigit(c)) {
+                this->readNumber();
+            } else {
+                std::cerr << "Unexpected token " << c << std::endl;
+            }
             break;
     }
 }
@@ -116,6 +120,10 @@ bool Scanner::nextCharMatches(char expected) {
 
 char Scanner::peek() {
     return this->isAtEnd() ? '\0' : this->code[this->current];
+}
+
+char Scanner::peekNext() {
+    return this->isAtEnd() ? '\0' : this->code[this->current + 1];
 }
 
 void Scanner::readString() {
@@ -136,8 +144,25 @@ void Scanner::readString() {
     addToken(TokenType::String, value);
 }
 
-void Scanner::addToken(TokenType type, std::any literal) {
+void Scanner::addToken(TokenType type, const std::any &literal) {
     int lexemeLength = this->current - this->start;
     std::string_view text = this->code.substr(this->start, lexemeLength);
     this->tokens.emplace_back(type, text, literal, line);
+}
+
+void Scanner::readNumber() {
+    while (Scanner::isDigit(this->peek())) this->advance();
+
+    if (this->peek() == '.' && Scanner::isDigit(this->peekNext())) {
+        this->advance();
+
+        while (Scanner::isDigit(this->peek())) this->advance();
+    }
+
+    std::string_view lexeme = this->code.substr(this->start, this->current - this->start);
+    this->tokens.emplace_back(TokenType::Number, lexeme, nullptr, line);
+}
+
+bool Scanner::isDigit(char c) {
+    return c >= '0' && c <= '9';
 }

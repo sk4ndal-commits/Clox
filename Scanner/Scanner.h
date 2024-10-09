@@ -26,13 +26,19 @@ public:
 
     char peek();
 
+    char peekNext();
+
     void addToken(TokenType type);
 
-    void addToken(TokenType type, std::any literal);
+    void addToken(TokenType type, const std::any& literal);
 
     void readString();
 
+    void readNumber();
+
     bool isAtEnd();
+
+    static bool isDigit(char c);
 
     bool nextCharMatches(char  expected);
 };

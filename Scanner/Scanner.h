@@ -36,9 +36,17 @@ public:
 
     void readNumber();
 
+    void readIdentifier();
+
     bool isAtEnd();
+
+    bool nextCharMatches(char  expected);
 
     static bool isDigit(char c);
 
-    bool nextCharMatches(char  expected);
+    static bool isAlpha(char c);
+
+    static bool isAlphaNumeric(char c);
+
+    static void initializeKeywords();
 };

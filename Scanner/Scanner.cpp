@@ -4,9 +4,34 @@
 
 #include <vector>
 #include <iostream>
+#include <unordered_map>
 #include "Scanner.h"
 
-Scanner::Scanner() : current(0), start(0), line(0) {}
+std::unordered_map<std::string_view , TokenType> keywords;
+
+void Scanner::initializeKeywords() {
+    keywords["and"] = TokenType::And;
+    keywords["class"] = TokenType::Class;
+    keywords["else"] = TokenType::Else;
+    keywords["false"] = TokenType::False;
+    keywords["for"] = TokenType::For;
+    keywords["fun"] = TokenType::Fun;
+    keywords["if"] = TokenType::If;
+    keywords["nil"] = TokenType::Nil;
+    keywords["or"] = TokenType::Or;
+    keywords["print"] = TokenType::Print;
+    keywords["return"] = TokenType::Return;
+    keywords["super"] = TokenType::Super;
+    keywords["this"] = TokenType::This;
+    keywords["true"] = TokenType::True;
+    keywords["var"] = TokenType::Var;
+    keywords["while"] = TokenType::While;
+}
+
+// Scanner constructor
+Scanner::Scanner() : current(0), start(0), line(0) {
+    Scanner::initializeKeywords();
+}
 
 Scanner::~Scanner() = default;
 
@@ -19,8 +44,8 @@ std::vector<Token> Scanner::scanTokens(const std::string_view &source) {
         this->scanToken();
     }
 
-    tokens.emplace_back(TokenType::Eof, "", nullptr, line);
-    return tokens;
+    this->tokens.emplace_back(TokenType::Eof, "", nullptr, line);
+    return this->tokens;
 }
 
 char Scanner::advance() {
@@ -32,60 +57,60 @@ void Scanner::addToken(TokenType type) {
 }
 
 void Scanner::scanToken() {
-    char c = advance();
+    char c = this->advance();
     switch (c) {
         case '(':
-            addToken(TokenType::LeftParen);
+            this->addToken(TokenType::LeftParen);
             break;
         case ')':
-            addToken(TokenType::RightParen);
+            this->addToken(TokenType::RightParen);
             break;
         case '{':
-            addToken(TokenType::LeftBrace);
+            this->addToken(TokenType::LeftBrace);
             break;
         case '}':
-            addToken(TokenType::RightBrace);
+            this->addToken(TokenType::RightBrace);
             break;
         case ',':
-            addToken(TokenType::Comma);
+            this->addToken(TokenType::Comma);
             break;
         case '.':
-            addToken(TokenType::Dot);
+            this->addToken(TokenType::Dot);
             break;
         case '-':
-            addToken(TokenType::Minus);
+            this->addToken(TokenType::Minus);
             break;
         case '+':
-            addToken(TokenType::Plus);
+            this->addToken(TokenType::Plus);
             break;
         case ';':
-            addToken(TokenType::Semicolon);
+            this->addToken(TokenType::Semicolon);
             break;
         case '*':
-            addToken(TokenType::Star);
+            this->addToken(TokenType::Star);
             break;
         case '!':
-            addToken(nextCharMatches('=') ?
+            this->addToken(this->nextCharMatches('=') ?
                      TokenType::BangEqual : TokenType::Bang);
             break;
         case '=':
-            addToken(nextCharMatches('=') ?
+            this->addToken(this->nextCharMatches('=') ?
                      TokenType::EqualEqual : TokenType::Equal);
             break;
         case '<':
-            addToken(nextCharMatches('=') ?
+            this->addToken(this->nextCharMatches('=') ?
                      TokenType::LessEqual : TokenType::Less);
             break;
         case '>':
-            addToken(nextCharMatches('=') ?
+            this->addToken(this->nextCharMatches('=') ?
                      TokenType::GreaterEqual : TokenType::Greater);
             break;
         case '/':
-            if (nextCharMatches('/')) {
-                while (peek() != '\n' && !isAtEnd())
-                    advance();
+            if (this->nextCharMatches('/')) {
+                while (this->peek() != '\n' && !this->isAtEnd())
+                    this->advance();
             } else {
-                addToken(TokenType::Slash);
+                this->addToken(TokenType::Slash);
             }
             break;
         case ' ':
@@ -101,7 +126,10 @@ void Scanner::scanToken() {
         default:
             if (Scanner::isDigit(c)) {
                 this->readNumber();
-            } else {
+            } else if (Scanner::isAlpha(c)) {
+                this->readIdentifier();
+            }
+            else {
                 std::cerr << "Unexpected token " << c << std::endl;
             }
             break;
@@ -123,7 +151,7 @@ char Scanner::peek() {
 }
 
 char Scanner::peekNext() {
-    return this->isAtEnd() ? '\0' : this->code[this->current + 1];
+    return this->current+1 >= this->code.length() ? '\0' : this->code[this->current + 1];
 }
 
 void Scanner::readString() {
@@ -139,9 +167,8 @@ void Scanner::readString() {
     advance();
 
     int lexemeLength = (this->current - 1) - (this->start + 1);
-    std::string_view value =
-            this->code.substr(this->start + 1, lexemeLength);
-    addToken(TokenType::String, value);
+    std::string_view value = this->code.substr(this->start + 1, lexemeLength);
+    this->addToken(TokenType::String, value);
 }
 
 void Scanner::addToken(TokenType type, const std::any &literal) {
@@ -165,4 +192,23 @@ void Scanner::readNumber() {
 
 bool Scanner::isDigit(char c) {
     return c >= '0' && c <= '9';
+}
+
+bool Scanner::isAlpha(char c) {
+    return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' || c == '_';
+}
+
+bool Scanner::isAlphaNumeric(char c) {
+    return Scanner::isDigit(c) || Scanner::isAlpha(c);
+}
+
+void Scanner::readIdentifier() {
+    while (Scanner::isAlphaNumeric(this->peek())) this->advance();
+
+    std::string_view text = this->code.substr(this->start, this->current - this->start);
+
+    if (keywords.contains(text))
+        this->addToken(keywords[text]);
+    else
+        this->addToken(TokenType::Identifier);
 }

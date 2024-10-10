@@ -24,7 +24,6 @@ void Interpreter::run(const std::string_view &source) {
 
     for (Token &token: tokens)
         if (!token.lexeme.empty()) {
-            std::cout << "Lexeme " << token.lexeme << " on line " << token.line
-                      << std::endl;
+            std::cout << "Lexeme " << token.lexeme << " on line " << token.line << std::endl;
         }
 }

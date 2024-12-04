@@ -18,15 +18,15 @@ public:
 
     ~Scanner();
 
-    std::vector<Token> scanTokens(const std::string_view &source);
+    std::vector<Token>& scanTokens(const std::string_view &source);
 
     void scanToken();
 
     char advance();
 
-    char peek();
+    char peek() const;
 
-    char peekNext();
+    char peekNext() const;
 
     void addToken(TokenType type);
 
@@ -38,7 +38,7 @@ public:
 
     void readIdentifier();
 
-    bool isAtEnd();
+    bool isAtEnd() const;
 
     bool nextCharMatches(char  expected);
 

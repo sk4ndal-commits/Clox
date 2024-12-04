@@ -6,7 +6,8 @@
 #include <any>
 #include "../Enums/TokenType.cpp"
 
-typedef struct Token {
+typedef struct Token
+{
     TokenType type;
     std::string_view lexeme;
     std::any literal;
